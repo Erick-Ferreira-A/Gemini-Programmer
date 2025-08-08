@@ -10,8 +10,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Chosen Palette: Slate and Sky -->
-    <!-- Application Structure Plan: A single-page application with a fixed sidebar navigation. This structure was chosen to transform the linear guide into a non-linear, interactive learning tool. Users can easily jump between core concepts, setup, and specific commands without losing context. This task-oriented design is more practical for both initial learning and later reference. The main content area updates dynamically via JavaScript, providing a seamless user experience. -->
-    <!-- Visualization & Content Choices: Report Info: Git/GitHub Commands & Concepts -> Goal: Instruct & Inform -> Viz/Presentation Method: Styled text blocks and code snippets with copy buttons. A simple workflow diagram is built with HTML/CSS to visualize the add-commit-push cycle. -> Interaction: Main navigation clicks to switch content panes; copy buttons to grab code snippets. -> Justification: Since the source is textual, the focus is on information architecture and micro-interactions rather than data charts. Copy buttons reduce user friction. The HTML diagram makes the abstract workflow tangible. -> Library/Method: Vanilla JS for navigation and DOM manipulation, Tailwind CSS for styling. -->
+    <!-- Application Structure Plan: A single-page application with a fixed sidebar navigation on larger screens, which transforms into a collapsible, off-canvas menu on mobile. This responsive structure ensures optimal usability across all devices. Users on desktop get a multi-pane view, while mobile users get a focused, uncluttered view with on-demand navigation. This hybrid approach is ideal for a learning tool that may be used in various contexts. -->
+    <!-- Visualization & Content Choices: Report Info: Git/GitHub Commands & Concepts -> Goal: Instruct & Inform -> Viz/Presentation Method: Styled text blocks and code snippets with copy buttons. A simple workflow diagram is built with HTML/CSS to visualize the add-commit-push cycle. -> Interaction: Main navigation clicks to switch content panes; copy buttons to grab code snippets; hamburger menu to toggle navigation on mobile. -> Justification: The core content is textual, so the focus is on responsive information architecture and micro-interactions. The collapsible menu is a standard, user-friendly pattern for mobile navigation. -> Library/Method: Vanilla JS for navigation and DOM manipulation, Tailwind CSS for styling and responsiveness. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         body {
@@ -42,54 +42,73 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        /* Mobile sidebar styles */
+        .sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+        .sidebar-hidden {
+            transform: translateX(-100%);
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
 
-    <div class="flex min-h-screen">
+    <div class="relative min-h-screen md:flex">
+        <!-- Mobile menu button -->
+        <div class="bg-slate-800 text-gray-100 flex justify-between md:hidden">
+            <a href="#" class="block p-4 text-white font-bold text-sky-400">Guia de Git</a>
+            <button id="mobile-menu-button" class="p-4 focus:outline-none focus:bg-slate-700">
+                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
+
         <!-- Sidebar Navigation -->
-        <aside class="w-64 bg-slate-800 text-white p-4 flex-shrink-0 flex flex-col">
-            <h1 class="text-2xl font-bold text-sky-400 mb-8 border-b border-slate-600 pb-4">Guia de Git</h1>
-            <nav class="flex flex-col space-y-2">
-                <a href="#" class="nav-link active" data-tab="inicio">
-                    <span class="flex items-center p-2 rounded-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>
-                        Início
-                    </span>
-                </a>
-                <a href="#" class="nav-link" data-tab="conceitos">
-                     <span class="flex items-center p-2 rounded-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>
-                        Conceitos
-                    </span>
-                </a>
-                <a href="#" class="nav-link" data-tab="configuracao">
-                     <span class="flex items-center p-2 rounded-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" /></svg>
-                        Configuração
-                    </span>
-                </a>
-                <a href="#" class="nav-link" data-tab="fluxo">
-                     <span class="flex items-center p-2 rounded-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path d="M8 5a1 1 0 100 2h5.586l-1.293 1.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L13.586 5H8zM12 15a1 1 0 100-2H6.414l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L6.414 15H12z" /></svg>
-                        Fluxo Básico
-                    </span>
-                </a>
-                <a href="#" class="nav-link" data-tab="comandos">
-                     <span class="flex items-center p-2 rounded-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" /></svg>
-                        Comandos Essenciais
-                    </span>
-                </a>
-                <a href="#" class="nav-link" data-tab="recursos">
-                     <span class="flex items-center p-2 rounded-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" /><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" /></svg>
-                        Recursos
-                    </span>
-                </a>
-            </nav>
+        <aside id="sidebar" class="sidebar sidebar-hidden absolute inset-y-0 left-0 bg-slate-800 text-white w-64 p-4 space-y-6 z-30 md:relative md:flex md:flex-col md:transform-none">
+            <div>
+                <h1 class="text-2xl font-bold text-sky-400 mb-8 border-b border-slate-600 pb-4">Guia de Git</h1>
+                <nav class="flex flex-col space-y-2">
+                    <a href="#" class="nav-link active" data-tab="inicio">
+                        <span class="flex items-center p-2 rounded-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>
+                            Início
+                        </span>
+                    </a>
+                    <a href="#" class="nav-link" data-tab="conceitos">
+                         <span class="flex items-center p-2 rounded-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>
+                            Conceitos
+                        </span>
+                    </a>
+                    <a href="#" class="nav-link" data-tab="configuracao">
+                         <span class="flex items-center p-2 rounded-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" /></svg>
+                            Configuração
+                        </span>
+                    </a>
+                    <a href="#" class="nav-link" data-tab="fluxo">
+                         <span class="flex items-center p-2 rounded-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path d="M8 5a1 1 0 100 2h5.586l-1.293 1.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L13.586 5H8zM12 15a1 1 0 100-2H6.414l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L6.414 15H12z" /></svg>
+                            Fluxo Básico
+                        </span>
+                    </a>
+                    <a href="#" class="nav-link" data-tab="comandos">
+                         <span class="flex items-center p-2 rounded-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" /></svg>
+                            Comandos Essenciais
+                        </span>
+                    </a>
+                    <a href="#" class="nav-link" data-tab="recursos">
+                         <span class="flex items-center p-2 rounded-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" /><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" /></svg>
+                            Recursos
+                        </span>
+                    </a>
+                </nav>
+            </div>
             <div class="mt-auto text-xs text-slate-400">
-                <p>Guia Interativo v1.0</p>
+                <p>Guia Interativo v1.1</p>
                 <p>&copy; 2024. Criado para aprendizado.</p>
             </div>
         </aside>
@@ -99,8 +118,8 @@
             <div id="content-container">
                 <!-- Início Section -->
                 <section id="inicio" class="content-section">
-                    <h2 class="text-4xl font-bold text-slate-900 mb-4">Bem-vindo ao Guia Interativo de Git e GitHub</h2>
-                    <p class="text-lg text-slate-600 mb-6">Esta aplicação foi criada para ajudar você a aprender os fundamentos do Git e GitHub de uma forma prática e organizada. Use a navegação ao lado para explorar os conceitos, configurar seu ambiente e praticar os comandos essenciais.</p>
+                    <h2 class="text-3xl lg:text-4xl font-bold text-slate-900 mb-4">Bem-vindo ao Guia Interativo de Git e GitHub</h2>
+                    <p class="text-lg text-slate-600 mb-6">Esta aplicação foi criada para ajudar você a aprender os fundamentos do Git e GitHub de uma forma prática e organizada. Use a navegação para explorar os conceitos, configurar seu ambiente e praticar os comandos essenciais.</p>
                     <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
                         <h3 class="text-2xl font-semibold text-sky-700 mb-3">Por onde começar?</h3>
                         <p class="mb-4">Sugerimos seguir a ordem do menu para uma experiência de aprendizado progressiva:</p>
@@ -170,13 +189,13 @@ git config --global user.email "seu.email@exemplo.com"</code></pre>
                             <h4 class="font-bold text-lg">1. Modificar</h4>
                             <p class="text-sm text-slate-600">Crie ou edite seus arquivos no seu diretório de trabalho.</p>
                         </div>
-                        <div class="text-2xl text-slate-400 font-mono">&rarr;</div>
+                        <div class="text-2xl text-slate-400 font-mono my-2 md:my-0">&rarr;</div>
                         <div class="p-4 bg-white rounded-lg shadow-md w-full md:w-1/4">
                              <p class="text-5xl mb-2">📥</p>
                             <h4 class="font-bold text-lg">2. Adicionar (`add`)</h4>
                             <p class="text-sm text-slate-600">Use `git add` para preparar as mudanças para o próximo commit.</p>
                         </div>
-                        <div class="text-2xl text-slate-400 font-mono">&rarr;</div>
+                        <div class="text-2xl text-slate-400 font-mono my-2 md:my-0">&rarr;</div>
                         <div class="p-4 bg-white rounded-lg shadow-md w-full md:w-1/4">
                              <p class="text-5xl mb-2">💾</p>
                             <h4 class="font-bold text-lg">3. Salvar (`commit`)</h4>
@@ -281,10 +300,18 @@ git config --global user.email "seu.email@exemplo.com"</code></pre>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.getElementById('sidebar');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
             const navLinks = document.querySelectorAll('.nav-link');
             const contentSections = document.querySelectorAll('.content-section');
             const copyButtons = document.querySelectorAll('.copy-btn');
 
+            // Toggle mobile menu
+            mobileMenuButton.addEventListener('click', () => {
+                sidebar.classList.toggle('sidebar-hidden');
+            });
+
+            // Navigation logic
             navLinks.forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -294,21 +321,22 @@ git config --global user.email "seu.email@exemplo.com"</code></pre>
                     link.classList.add('active');
 
                     contentSections.forEach(section => {
-                        if (section.id === tab) {
-                            section.classList.remove('hidden');
-                        } else {
-                            section.classList.add('hidden');
-                        }
+                        section.classList.toggle('hidden', section.id !== tab);
                     });
+                    
+                    // Hide sidebar on mobile after navigation
+                    if (window.innerWidth < 768) {
+                        sidebar.classList.add('sidebar-hidden');
+                    }
                 });
             });
 
+            // Copy button logic
             copyButtons.forEach(button => {
                 button.addEventListener('click', () => {
                     const codeBlock = button.nextElementSibling;
                     const code = codeBlock.innerText;
                     
-                    // Using the Clipboard API
                     navigator.clipboard.writeText(code).then(() => {
                         const originalText = button.innerText;
                         button.innerText = 'Copiado!';
@@ -319,7 +347,6 @@ git config --global user.email "seu.email@exemplo.com"</code></pre>
                         }, 2000);
                     }).catch(err => {
                         console.error('Falha ao copiar texto: ', err);
-                        // Fallback for older browsers
                         try {
                             const textArea = document.createElement('textarea');
                             textArea.value = code;
