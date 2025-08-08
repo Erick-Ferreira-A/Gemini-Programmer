@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia Interativo de Git e GitHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Slate and Sky -->
+    <!-- Application Structure Plan: A single-page application with a fixed sidebar navigation. This structure was chosen to transform the linear guide into a non-linear, interactive learning tool. Users can easily jump between core concepts, setup, and specific commands without losing context. This task-oriented design is more practical for both initial learning and later reference. The main content area updates dynamically via JavaScript, providing a seamless user experience. -->
+    <!-- Visualization & Content Choices: Report Info: Git/GitHub Commands & Concepts -> Goal: Instruct & Inform -> Viz/Presentation Method: Styled text blocks and code snippets with copy buttons. A simple workflow diagram is built with HTML/CSS to visualize the add-commit-push cycle. -> Interaction: Main navigation clicks to switch content panes; copy buttons to grab code snippets. -> Justification: Since the source is textual, the focus is on information architecture and micro-interactions rather than data charts. Copy buttons reduce user friction. The HTML diagram makes the abstract workflow tangible. -> Library/Method: Vanilla JS for navigation and DOM manipulation, Tailwind CSS for styling. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .code-block {
+            position: relative;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .nav-link.active {
+            background-color: #0284c7; /* sky-600 */
+            color: white;
+            font-weight: 600;
+        }
+        .content-section {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="flex min-h-screen">
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 bg-slate-800 text-white p-4 flex-shrink-0 flex flex-col">
+            <h1 class="text-2xl font-bold text-sky-400 mb-8 border-b border-slate-600 pb-4">Guia de Git</h1>
+            <nav class="flex flex-col space-y-2">
+                <a href="#" class="nav-link active" data-tab="inicio">
+                    <span class="flex items-center p-2 rounded-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>
+                        Início
+                    </span>
+                </a>
+                <a href="#" class="nav-link" data-tab="conceitos">
+                     <span class="flex items-center p-2 rounded-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>
+                        Conceitos
+                    </span>
+                </a>
+                <a href="#" class="nav-link" data-tab="configuracao">
+                     <span class="flex items-center p-2 rounded-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" /></svg>
+                        Configuração
+                    </span>
+                </a>
+                <a href="#" class="nav-link" data-tab="fluxo">
+                     <span class="flex items-center p-2 rounded-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path d="M8 5a1 1 0 100 2h5.586l-1.293 1.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L13.586 5H8zM12 15a1 1 0 100-2H6.414l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L6.414 15H12z" /></svg>
+                        Fluxo Básico
+                    </span>
+                </a>
+                <a href="#" class="nav-link" data-tab="comandos">
+                     <span class="flex items-center p-2 rounded-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" /></svg>
+                        Comandos Essenciais
+                    </span>
+                </a>
+                <a href="#" class="nav-link" data-tab="recursos">
+                     <span class="flex items-center p-2 rounded-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" /><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" /></svg>
+                        Recursos
+                    </span>
+                </a>
+            </nav>
+            <div class="mt-auto text-xs text-slate-400">
+                <p>Guia Interativo v1.0</p>
+                <p>&copy; 2024. Criado para aprendizado.</p>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6 sm:p-8 md:p-12 bg-slate-100 overflow-y-auto">
+            <div id="content-container">
+                <!-- Início Section -->
+                <section id="inicio" class="content-section">
+                    <h2 class="text-4xl font-bold text-slate-900 mb-4">Bem-vindo ao Guia Interativo de Git e GitHub</h2>
+                    <p class="text-lg text-slate-600 mb-6">Esta aplicação foi criada para ajudar você a aprender os fundamentos do Git e GitHub de uma forma prática e organizada. Use a navegação ao lado para explorar os conceitos, configurar seu ambiente e praticar os comandos essenciais.</p>
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                        <h3 class="text-2xl font-semibold text-sky-700 mb-3">Por onde começar?</h3>
+                        <p class="mb-4">Sugerimos seguir a ordem do menu para uma experiência de aprendizado progressiva:</p>
+                        <ol class="list-decimal list-inside space-y-2 text-slate-700">
+                            <li><b class="font-semibold">Conceitos:</b> Entenda o "porquê" por trás do controle de versão.</li>
+                            <li><b class="font-semibold">Configuração:</b> Prepare seu computador para começar.</li>
+                            <li><b class="font-semibold">Fluxo Básico:</b> Aprenda o ciclo de trabalho diário com Git.</li>
+                            <li><b class="font-semibold">Comandos Essenciais:</b> Domine os comandos para colaborar e gerenciar projetos.</li>
+                        </ol>
+                    </div>
+                </section>
+
+                <!-- Conceitos Section -->
+                <section id="conceitos" class="content-section hidden">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-6">Conceitos Fundamentais</h2>
+                    <div class="space-y-6">
+                        <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                            <h3 class="text-xl font-semibold text-sky-700 mb-2">Controle de Versão</h3>
+                            <p>Imagine que você está escrevendo um livro. A cada dia, você salva uma nova versão do arquivo (`livro_v1.doc`, `livro_v2.doc`, `livro_final.doc`). O controle de versão automatiza isso de forma inteligente. Ele permite que você salve "fotos" (snapshots) do seu projeto em momentos específicos, veja o que mudou entre uma foto e outra, e até mesmo volte para uma foto antiga se algo der errado.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                            <h3 class="text-xl font-semibold text-sky-700 mb-2">Git</h3>
+                            <p>É o <b>software</b> de controle de versão que você instala no seu computador. Ele é a ferramenta que tira essas "fotos" (chamadas de <b>commits</b>) e gerencia todo o histórico do seu projeto localmente.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                            <h3 class="text-xl font-semibold text-sky-700 mb-2">GitHub</h3>
+                            <p>É uma <b>plataforma online</b> (um site) que hospeda seus projetos Git. Pense nele como uma rede social para códigos. Ele permite que você guarde uma cópia de segurança do seu projeto na nuvem, colabore com outras pessoas e mostre seu trabalho para o mundo.</p>
+                        </div>
+                         <div class="bg-sky-100 border-l-4 border-sky-500 text-sky-800 p-4 rounded-r-lg">
+                            <p><b class="font-semibold">Analogia:</b> O <b>Git</b> é como o Microsoft Word, que você usa para escrever no seu computador. O <b>GitHub</b> é como o Google Drive, onde você salva o trabalho online para compartilhar e colaborar.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Configuração Section -->
+                <section id="configuracao" class="content-section hidden">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-6">Prepare seu Ambiente</h2>
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">1. Instale o Git</h3>
+                            <p>Acesse o <a href="https://git-scm.com/downloads" target="_blank" class="text-sky-600 hover:underline font-medium">site oficial do Git</a> e baixe a versão para o seu sistema operacional. Siga as instruções de instalação padrão.</p>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">2. Crie uma Conta no GitHub</h3>
+                            <p>Acesse <a href="https://github.com" target="_blank" class="text-sky-600 hover:underline font-medium">github.com</a> e crie uma conta gratuita. É rápido e simples.</p>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">3. Configure o Git no seu Computador</h3>
+                            <p class="mb-3">Abra o terminal (ou Git Bash no Windows) e digite os seguintes comandos, substituindo pelas suas informações. Isso é importante para que o Git saiba quem é o autor dos commits.</p>
+                            <div class="code-block bg-slate-800 text-white p-4 rounded-lg">
+                                <button class="copy-btn bg-slate-600 hover:bg-sky-500 text-white">Copiar</button>
+                                <pre><code class="language-bash">git config --global user.name "Seu Nome"
+git config --global user.email "seu.email@exemplo.com"</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Fluxo Básico Section -->
+                <section id="fluxo" class="content-section hidden">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-6">O Fluxo de Trabalho Básico</h2>
+                    <p class="text-slate-600 mb-8">Este é o ciclo que você mais usará no seu dia a dia. Ele acontece em três etapas principais: modificar seus arquivos, adicionar as mudanças para a "área de preparação" (staging area) e, finalmente, "commitar" (salvar) essas mudanças no seu histórico local.</p>
+                    
+                    <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 text-center">
+                        <div class="p-4 bg-white rounded-lg shadow-md w-full md:w-1/4">
+                            <p class="text-5xl mb-2">📝</p>
+                            <h4 class="font-bold text-lg">1. Modificar</h4>
+                            <p class="text-sm text-slate-600">Crie ou edite seus arquivos no seu diretório de trabalho.</p>
+                        </div>
+                        <div class="text-2xl text-slate-400 font-mono">&rarr;</div>
+                        <div class="p-4 bg-white rounded-lg shadow-md w-full md:w-1/4">
+                             <p class="text-5xl mb-2">📥</p>
+                            <h4 class="font-bold text-lg">2. Adicionar (`add`)</h4>
+                            <p class="text-sm text-slate-600">Use `git add` para preparar as mudanças para o próximo commit.</p>
+                        </div>
+                        <div class="text-2xl text-slate-400 font-mono">&rarr;</div>
+                        <div class="p-4 bg-white rounded-lg shadow-md w-full md:w-1/4">
+                             <p class="text-5xl mb-2">💾</p>
+                            <h4 class="font-bold text-lg">3. Salvar (`commit`)</h4>
+                            <p class="text-sm text-slate-600">Use `git commit` para salvar um snapshot permanente no histórico.</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-10 space-y-6">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">Iniciar um Repositório (`git init`)</h3>
+                            <p class="mb-3">Dentro da sua pasta de projeto, no terminal, digite:</p>
+                            <div class="code-block bg-slate-800 text-white p-4 rounded-lg">
+                                <button class="copy-btn bg-slate-600 hover:bg-sky-500 text-white">Copiar</button>
+                                <pre><code class="language-bash">git init</code></pre>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">Adicionar Arquivos (`git add`)</h3>
+                            <p class="mb-3">Para preparar um arquivo específico para o commit:</p>
+                            <div class="code-block bg-slate-800 text-white p-4 rounded-lg">
+                                <button class="copy-btn bg-slate-600 hover:bg-sky-500 text-white">Copiar</button>
+                                <pre><code class="language-bash">git add nome-do-arquivo.txt</code></pre>
+                            </div>
+                             <p class="mt-3 mb-3">Para adicionar todos os arquivos modificados na pasta:</p>
+                            <div class="code-block bg-slate-800 text-white p-4 rounded-lg">
+                                <button class="copy-btn bg-slate-600 hover:bg-sky-500 text-white">Copiar</button>
+                                <pre><code class="language-bash">git add .</code></pre>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">Salvar as Mudanças (`git commit`)</h3>
+                            <p class="mb-3">Salve a "foto" do seu projeto com uma mensagem descritiva:</p>
+                            <div class="code-block bg-slate-800 text-white p-4 rounded-lg">
+                                <button class="copy-btn bg-slate-600 hover:bg-sky-500 text-white">Copiar</button>
+                                <pre><code class="language-bash">git commit -m "Mensagem descritiva sobre a mudança"</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Comandos Essenciais Section -->
+                <section id="comandos" class="content-section hidden">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-6">Comandos Essenciais</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                            <h3 class="font-mono text-lg font-semibold text-sky-700">git status</h3>
+                            <p class="mt-2 text-slate-600">Mostra o estado do seu diretório de trabalho e da área de preparação. Use-o constantemente para ver quais arquivos foram modificados e o que está pronto para ser commitado.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                            <h3 class="font-mono text-lg font-semibold text-sky-700">git log</h3>
+                            <p class="mt-2 text-slate-600">Exibe o histórico de commits, mostrando o autor, data e mensagem de cada commit. Essencial para entender a evolução do projeto.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                            <h3 class="font-mono text-lg font-semibold text-sky-700">git push</h3>
+                            <p class="mt-2 text-slate-600">Envia seus commits locais para o repositório remoto (como o GitHub). É como fazer o upload das suas mudanças para a nuvem.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                            <h3 class="font-mono text-lg font-semibold text-sky-700">git pull</h3>
+                            <p class="mt-2 text-slate-600">Busca e mescla as mudanças do repositório remoto para o seu diretório de trabalho local. Use antes de começar a trabalhar para garantir que você tem a versão mais recente.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                            <h3 class="font-mono text-lg font-semibold text-sky-700">git clone [url]</h3>
+                            <p class="mt-2 text-slate-600">Cria uma cópia local de um repositório que já existe remotamente. É o primeiro passo para começar a trabalhar em um projeto existente.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                            <h3 class="font-mono text-lg font-semibold text-sky-700">git branch [nome]</h3>
+                            <p class="mt-2 text-slate-600">Cria uma nova "ramificação" (branch), uma linha de desenvolvimento independente. Permite trabalhar em novas funcionalidades sem afetar a linha principal (`main`).</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                            <h3 class="font-mono text-lg font-semibold text-sky-700">git checkout [nome]</h3>
+                            <p class="mt-2 text-slate-600">Muda para a branch especificada, permitindo que você trabalhe nela.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                            <h3 class="font-mono text-lg font-semibold text-sky-700">git merge [nome]</h3>
+                            <p class="mt-2 text-slate-600">Junta o histórico da branch especificada na sua branch atual. É como você integra uma nova funcionalidade de volta à linha principal.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Recursos Section -->
+                <section id="recursos" class="content-section hidden">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-6">Recursos para Continuar Aprendendo</h2>
+                    <p class="text-slate-600 mb-8">A prática leva à perfeição. Continue explorando e usando Git e GitHub nos seus projetos. Aqui estão alguns recursos excelentes para aprofundar seus conhecimentos.</p>
+                    <div class="space-y-4">
+                        <a href="https://skills.github.com/" target="_blank" class="block bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-slate-200">
+                            <h3 class="text-xl font-semibold text-sky-700">GitHub Skills</h3>
+                            <p class="text-slate-600 mt-1">Tutoriais interativos e gratuitos oferecidos pelo próprio GitHub para aprender fazendo.</p>
+                        </a>
+                        <a href="https://git-scm.com/doc" target="_blank" class="block bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-slate-200">
+                            <h3 class="text-xl font-semibold text-sky-700">Documentação Oficial do Git</h3>
+                            <p class="text-slate-600 mt-1">A fonte definitiva para consulta e aprofundamento em todos os comandos e conceitos do Git.</p>
+                        </a>
+                        <a href="https://www.youtube.com/" target="_blank" class="block bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-slate-200">
+                            <h3 class="text-xl font-semibold text-sky-700">Cursos em Vídeo</h3>
+                            <p class="text-slate-600 mt-1">Plataformas como YouTube, Coursera e Udemy têm excelentes cursos para iniciantes, com demonstrações visuais do fluxo de trabalho.</p>
+                        </a>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            const copyButtons = document.querySelectorAll('.copy-btn');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const tab = link.getAttribute('data-tab');
+
+                    navLinks.forEach(item => item.classList.remove('active'));
+                    link.classList.add('active');
+
+                    contentSections.forEach(section => {
+                        if (section.id === tab) {
+                            section.classList.remove('hidden');
+                        } else {
+                            section.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+
+            copyButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const codeBlock = button.nextElementSibling;
+                    const code = codeBlock.innerText;
+                    
+                    // Using the Clipboard API
+                    navigator.clipboard.writeText(code).then(() => {
+                        const originalText = button.innerText;
+                        button.innerText = 'Copiado!';
+                        button.classList.add('bg-green-500');
+                        setTimeout(() => {
+                            button.innerText = originalText;
+                            button.classList.remove('bg-green-500');
+                        }, 2000);
+                    }).catch(err => {
+                        console.error('Falha ao copiar texto: ', err);
+                        // Fallback for older browsers
+                        try {
+                            const textArea = document.createElement('textarea');
+                            textArea.value = code;
+                            document.body.appendChild(textArea);
+                            textArea.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(textArea);
+                            
+                            const originalText = button.innerText;
+                            button.innerText = 'Copiado!';
+                            button.classList.add('bg-green-500');
+                             setTimeout(() => {
+                                button.innerText = originalText;
+                                button.classList.remove('bg-green-500');
+                            }, 2000);
+                        } catch (e) {
+                           console.error('Fallback de cópia também falhou', e);
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
